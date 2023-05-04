@@ -26,7 +26,7 @@ TRANSFORMER_UNITS = [
     PROJECTION_DIM,
 ]  # size of the transformer layers
 TRANSFORMER_LAYERS = 8
-MLP_HEADS_UNITS = [2048, 1024]  # size of the final dense layer
+MLP_HEADS_UNITS = [2048, 1024]  # size of the final dense layers
 
 
 # Use data augmentation
@@ -45,7 +45,7 @@ data_augmentation.layers[0].adapt(x_train)
 # Implement multilayer perceptron (MLP)
 
 def mlp(x, hidden_units, dropout_rate):
-    for units in hidden_units:  # why using units in hidden_units?
+    for units in hidden_units:
         x = tf.keras.layers.Dense(units, activation=tf.nn.gelu)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
     return x
