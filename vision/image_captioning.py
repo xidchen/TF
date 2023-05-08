@@ -9,8 +9,7 @@ import tensorflow as tf
 
 
 SEED = 111
-np.random.seed(SEED)
-tf.random.set_seed(SEED)
+tf.keras.utils.set_random_seed(SEED)
 
 
 # Download the dataset
