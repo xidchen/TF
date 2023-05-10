@@ -49,6 +49,7 @@ Prerequisites
 
 import numpy as np
 import tensorflow_hub as hub
+# noinspection PyUnresolvedReferences
 import tensorflow_text
 
 

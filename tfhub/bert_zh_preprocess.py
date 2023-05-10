@@ -22,6 +22,7 @@ for the Transformer encoder model.
 
 import tensorflow as tf
 import tensorflow_hub as hub
+# noinspection PyUnresolvedReferences
 import tensorflow_text
 
 
