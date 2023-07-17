@@ -9,7 +9,7 @@ tf.keras.utils.set_random_seed(42)
 # Hyperparamters
 
 BATCH_SIZE = 64
-EPOCHS = 1  # should be at least 10 for convergence
+EPOCHS = 10  # should be at least 10 for convergence
 MAX_SEQUENCE_LENGTH = 40  # maybe too short
 SOURCE_VOCAB_SIZE = 15000
 TARGET_VOCAB_SIZE = 15000
@@ -231,22 +231,30 @@ def decode_sequences(input_sentences):
 
     # Define a function that outputs the next token's probability given the
     # input sequence.
-    def token_probability_fn(decoder_input_tokens):
-        return transformer(
+    def token_probability_fn(decoder_input_tokens, cache, index):
+        logits = transformer(
             [encoder_input_tokens, decoder_input_tokens]
-        )[:, -1, :]
+        )[:, index - 1, :]
+        hidden_states = None
+        return logits, hidden_states, cache
 
-    # Set the prompt to the '[START]' token.
-    prompt = tf.fill(
-        dims=(batch_size, 1), value=target_lang_tokenizer.token_to_id('[START]')
+    # Build a prompt of length 40 with a start token and padding tokens.
+    length = 40
+    start = tf.fill(
+        dims=(batch_size, 1),
+        value=target_lang_tokenizer.token_to_id("[START]")
     )
+    pad = tf.fill(
+        dims=(batch_size, length - 1),
+        value=target_lang_tokenizer.token_to_id("[PAD]")
+    )
+    prompt = tf.concat((start, pad), axis=-1)
 
-    generated_tokens = keras_nlp.utils.top_p_search(
+    generated_tokens = keras_nlp.samplers.GreedySampler()(
         token_probability_fn,
         prompt,
-        p=0.1,
-        max_length=40,
-        end_token_id=target_lang_tokenizer.token_to_id('[END]'),
+        end_token_id=target_lang_tokenizer.token_to_id("[END]"),
+        index=1,  # Start sampling after start token.
     )
     generated_sentences = target_lang_tokenizer.detokenize(generated_tokens)
     return generated_sentences
